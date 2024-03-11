@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int            @id @default(autoincrement())
+  name               String
+  email              String         @unique
+  password           String
+  verificationToken  String
+  isVerified         Boolean        @default(false)
+  passwordResetToken String?
+  refreshToken       refreshToken?
+  documents          Document[]
+  documentsUsers     documentUser[]
+  userRoles              userRole[]
+}
+
+enum RoleEnum {
+  ADMIN
+  SUPERADMIN
+}
+
+model Role {
+  id    Int        @id @default(autoincrement())
+  users userRole[]
+  name  RoleEnum
+}
+  
+model userRole {
+  id     Int  @id @default(autoincrement())
+  roleId Int
+  userId Int
+  role   Role @relation(fields: [roleId], references: [id])
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model refreshToken {
+  id     Int    @id @default(autoincrement())
+  token  String
+  userId Int    @unique
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model Document {
+  id            Int            @id @default(autoincrement())
+  title         String
+  content       String
+  isPublished   Boolean        @default(false)
+  userId        Int
+  user          User           @relation(fields: [userId], references: [id])
+  documentUsers documentUser[]
+}
+
+enum Permission {
+  VIEW
+  EDIT
+}
+
+model documentUser {
+  id         Int        @id @default(autoincrement())
+  permission Permission
+  userId     Int
+  documentId Int
+  user       User       @relation(fields: [userId], references: [id])
+  document   Document   @relation(fields: [documentId], references: [id])
+}
