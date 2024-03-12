@@ -27,7 +27,7 @@ export const signUp = async (req: Request, res: Response) => {
         })
 
         await sendMail({
-            from: 'tamkaido4@gmail.com',
+            from: process.env.MAIL,
             to: user.email,
             subject: 'Welcome to Docify, verify your email',
             text: `Hi ${user.name},Please verify your email by clicking on the following link: https://localhost:3000/verify-email/${verificationToken}`
@@ -189,7 +189,7 @@ export const resetPassword = async (req: Request, res: Response) => {
         })
 
         await sendMail({
-            from: 'tamkaido4@gmail.com',
+            from: process.env.MAIL,
             to: user.email,
             subject: 'Reset your password',
             text: `Hi ${user.name},Please reset your password by clicking on the following link: https://localhost:3000/reset-password/${passwordResetToken}`
