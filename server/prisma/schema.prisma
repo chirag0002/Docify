@@ -18,26 +18,6 @@ model User {
   refreshToken       refreshToken?
   documents          Document[]
   documentsUsers     documentUser[]
-  userRoles              userRole[]
-}
-
-enum RoleEnum {
-  ADMIN
-  SUPERADMIN
-}
-
-model Role {
-  id    Int        @id @default(autoincrement())
-  users userRole[]
-  name  RoleEnum
-}
-  
-model userRole {
-  id     Int  @id @default(autoincrement())
-  roleId Int
-  userId Int
-  role   Role @relation(fields: [roleId], references: [id])
-  user   User @relation(fields: [userId], references: [id])
 }
 
 model refreshToken {
@@ -49,9 +29,8 @@ model refreshToken {
 
 model Document {
   id            Int            @id @default(autoincrement())
-  title         String
-  content       String
-  isPublished   Boolean        @default(false)
+  title         String?
+  content       String?
   userId        Int
   user          User           @relation(fields: [userId], references: [id])
   documentUsers documentUser[]

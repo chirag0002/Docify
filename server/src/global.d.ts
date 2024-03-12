@@ -1,18 +1,28 @@
 import { Request } from "express";
 declare global {
-    namespace Express{
-        interface Request{
+    namespace Express {
+        interface Request {
             accessToken?: string;
             refreshToken?: string;
             user: {
                 id?: number,
                 name?: string,
                 email?: string,
-                password?:string
+                password?: string
                 isVerified?: boolean,
-                verificationToken?: string,
-                userRoles?:{ role: { name: string } }[];
+                verificationToken?: string
             };
+        }
+    }
+}
+
+declare global {
+    namespace NodeJS {
+        interface ProcessEnv {
+            EMAIL_KEY: string;
+            ACCESS_KEY: string;
+            PASSWORD_KEY: string;
+            REFRESH_KEY: string;
         }
     }
 }

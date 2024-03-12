@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client'
 import { genSalt, hash } from "bcrypt";
 import { VerifyErrors, sign, verify } from "jsonwebtoken";
 import { z } from "zod";
+import { sendMail } from "../../smtp-config";
 
 const prisma = new PrismaClient()
 
@@ -14,7 +15,7 @@ export const signUp = async (req: Request, res: Response) => {
 
         const hashedPassword = await hash(password, salt)
 
-        const verificationToken = sign({ email }, "emailverificationkey")
+        const verificationToken = sign({ email }, process.env.EMAIL_KEY)
 
         const user = await prisma.user.create({
             data: {
@@ -23,6 +24,13 @@ export const signUp = async (req: Request, res: Response) => {
                 password: hashedPassword,
                 verificationToken: verificationToken
             }
+        })
+
+        await sendMail({
+            from: 'tamkaido4@gmail.com',
+            to: user.email,
+            subject: 'Welcome to Docify, verify your email',
+            text: `Hi ${user.name},Please verify your email by clicking on the following link: https://localhost:3000/verify-email/${verificationToken}`
         })
 
         return res.status(201).json({
@@ -80,26 +88,15 @@ export const getUser = async (req: Request, res: Response) => {
         select: {
             id: true,
             name: true,
-            email: true,
-            userRoles: {
-                select: {
-                    role: {
-                        select: {
-                            name: true
-                        }
-                    }
-                }
-            }
+            email: true
         }
     })
     if (user) {
-        const userRoles = user.userRoles.map(role => role.role.name);
         return res.status(200).json({
             user: {
                 id: user.id,
                 name: user.name,
-                email: user.email,
-                userRoles: userRoles
+                email: user.email
             }
         })
     }
@@ -123,7 +120,7 @@ export const refreshToken = async (req: Request, res: Response) => {
             return res.status(403).json({ message: "token is invalid" })
         }
 
-        verify(token, "refreshtokenkey", async (error: VerifyErrors | null, decoded: any) => {
+        verify(token, process.env.REFRESH_KEY, async (error: VerifyErrors | null, decoded: any) => {
             if (error) {
                 return res.status(403).json({ message: "Token is invalid" });
             }
@@ -131,10 +128,10 @@ export const refreshToken = async (req: Request, res: Response) => {
                 if (!decoded) {
                     return res.status(403).json({ message: "Decoded token is invalid" });
                 }
-                const accessToken = sign({ id: decoded.id, email: decoded.email, roles: decoded.roles }, "accesstokenkey", {
+                const accessToken = sign({ id: decoded.id, email: decoded.email }, process.env.ACCESS_KEY, {
                     expiresIn: '24h'
                 });
-                const refreshToken = sign({ id: decoded.id, email: decoded.email, roles: decoded.roles }, "refreshtokenkey", {
+                const refreshToken = sign({ id: decoded.id, email: decoded.email }, process.env.REFRESH_KEY, {
                     expiresIn: '24h'
                 });
 
@@ -191,6 +188,13 @@ export const resetPassword = async (req: Request, res: Response) => {
             }
         })
 
+        await sendMail({
+            from: 'tamkaido4@gmail.com',
+            to: user.email,
+            subject: 'Reset your password',
+            text: `Hi ${user.name},Please reset your password by clicking on the following link: https://localhost:3000/reset-password/${passwordResetToken}`
+        })
+
         return res.status(200).json({
             message: "password reset link sent successfully"
         })
@@ -233,6 +237,49 @@ export const confirmPassword = async (req: Request, res: Response) => {
 
             return res.status(200).json({
                 message: "password changed successfully"
+            })
+        } catch (err) {
+            return res.status(403).json(err);
+        }
+    })
+}
+
+export const verifyEmail = async (req: Request, res: Response) => {
+    const token = req.params.token
+
+    verify(token, process.env.EMAIL_KEY, async (error: VerifyErrors | null, decoded: any) => {
+        if (error) {
+            return res.status(403).json({ message: "token is invalid" });
+        }
+        try {
+            if (!decoded) {
+                return res.status(403).json({ message: "decoded token is invalid" });
+            }
+
+            const user = await prisma.user.findUnique({
+                where: {
+                    email: decoded.email
+                }
+            })
+
+            if (!user) {
+                return res.status(404).json({ message: "user does not exists" })
+            }
+
+            if (user.isVerified) {
+                return res.status(403).json({ message: "user is already verified" })
+            }
+            await prisma.user.update({
+                where: {
+                    id: user.id
+                },
+                data: {
+                    isVerified: true
+                }
+            })
+
+            return res.status(200).json({
+                message: "email verified successfully"
             })
         } catch (err) {
             return res.status(403).json(err);
