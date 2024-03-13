@@ -59,7 +59,7 @@ export const shareDocument = async (req: Request, res: Response) => {
             from: document.user.email,
             to: sharedUser.email,
             subject: `${document.user.name} shared a document with you`,
-            text: `Hi ${sharedUser.name},You can access the document here: https://localhost:3000/document/${id}`
+            text: `Hi ${sharedUser.name}, You can access the document here: https://localhost:3000/document/${id}`
         }
 
         await sendMail(mail)

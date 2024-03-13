@@ -1,0 +1,27 @@
+import { API } from "./api"
+
+export const AuthService = {
+    signin: (payload:{email:string, password:string}) => {
+        return API.post('/api/v1/user/signin', payload)
+    },
+    signup: (payload:{name?:string, email:string, password:string}) => {
+        return API.post('/api/v1/user/signup', payload)
+    },
+    refreshToken : (payload:{token:string}) => {
+        return API.post('/api/v1/user/refresh-token', payload)
+    },
+    logout: (accessToken:string) => {
+        return API.delete('/api/v1/user/logout', {
+            headers : { Authorization: `Bearer ${accessToken}` }
+        })
+    },
+    verifyEmail: (token?:string) => {
+        return API.put(`/api/v1/user/verify-email/${token}`)
+    },
+    resetPassword: (payload:{email:string}) => {
+        return API.post('/api/v1/user/reset-password', payload)
+    },
+    confirmPassword: (payload:{password:string}, token?:string ) => {
+        return API.put(`/api/v1/user/password/${token}`, payload)    
+    }
+}

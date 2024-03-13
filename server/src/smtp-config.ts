@@ -3,7 +3,7 @@ import Mail from "nodemailer/lib/mailer";
 
 const transporter = createTransport({
     port: 465,
-    host: 'smtp.gmail.com',
+    service: "gmail",
     auth: {
         user: process.env.MAIL,
         pass: process.env.PASS
@@ -13,5 +13,16 @@ const transporter = createTransport({
 
 
 export const sendMail = async (mailOptions: Mail.Options) => {
-    transporter.sendMail(mailOptions)
+    try{
+        transporter.sendMail(mailOptions, (error, emailResponse) => {
+            if (error) {
+                throw error;
+            }
+        });
+    }catch(error){
+        console.log(error)
+    }
 }
+
+
+

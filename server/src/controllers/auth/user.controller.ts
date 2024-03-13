@@ -30,12 +30,11 @@ export const signUp = async (req: Request, res: Response) => {
             from: process.env.MAIL,
             to: user.email,
             subject: 'Welcome to Docify, verify your email',
-            text: `Hi ${user.name},Please verify your email by clicking on the following link: https://localhost:3000/verify-email/${verificationToken}`
+            text: `Hi ${user.name}, Please verify your email by clicking on the following link: https://localhost:5173/verify-your-email/${verificationToken}`
         })
 
         return res.status(201).json({
             message: "user created successfully",
-            token: user.verificationToken,
             user: {
                 id: user.id,
                 name: user.name
@@ -88,7 +87,8 @@ export const getUser = async (req: Request, res: Response) => {
         select: {
             id: true,
             name: true,
-            email: true
+            email: true,
+            isVerified: true
         }
     })
     if (user) {
@@ -96,7 +96,8 @@ export const getUser = async (req: Request, res: Response) => {
             user: {
                 id: user.id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                isVerified: user.isVerified
             }
         })
     }
@@ -157,7 +158,9 @@ export const refreshToken = async (req: Request, res: Response) => {
 
 export const resetPassword = async (req: Request, res: Response) => {
     const { email } = req.body;
-    const emailSchema = z.string().email({ message: "must be a valid email" });
+    const emailSchema = z.object({
+        email: z.string().email({ message: "must be a valid email" })
+    })
 
     try {
         const response = emailSchema.safeParse({ email });
@@ -192,7 +195,7 @@ export const resetPassword = async (req: Request, res: Response) => {
             from: process.env.MAIL,
             to: user.email,
             subject: 'Reset your password',
-            text: `Hi ${user.name},Please reset your password by clicking on the following link: https://localhost:3000/reset-password/${passwordResetToken}`
+            text: `Hi ${user.name}, Please reset your password by clicking on the following link: https://localhost:5173/reset-your-password/${passwordResetToken}`
         })
 
         return res.status(200).json({
@@ -205,7 +208,9 @@ export const resetPassword = async (req: Request, res: Response) => {
 
 export const confirmPassword = async (req: Request, res: Response) => {
     const { password } = req.body
-    const passwordSchema = z.string().min(8, { message: "password must be at least 8 characters" })
+    const passwordSchema = z.object({
+        password: z.string().min(8, { message: "password must be at least 8 characters" })
+    })
 
     const response = passwordSchema.safeParse({ password })
     if (!response.success) {
@@ -267,7 +272,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
             }
 
             if (user.isVerified) {
-                return res.status(403).json({ message: "user is already verified" })
+                return res.status(402).json({ message: "user is already verified" })
             }
             await prisma.user.update({
                 where: {
