@@ -8,11 +8,11 @@ export interface LabeledInputType {
 }
 
 export interface DocumentInterface {
-    id: number;
-    title: string;
-    content: string;
-    userId: number;
-    users: DocumentUserInterface[];
+    id?: number;
+    title?: string;
+    content?: string;
+    userId?: number;
+    users?: DocumentUserInterface[];
 }
 
 export enum PermissionEnum {

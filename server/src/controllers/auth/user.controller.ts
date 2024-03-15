@@ -30,15 +30,11 @@ export const signUp = async (req: Request, res: Response) => {
             from: process.env.MAIL,
             to: user.email,
             subject: 'Welcome to Docify, verify your email',
-            text: `Hi ${user.name}, Please verify your email by clicking on the following link: https://localhost:5173/verify-your-email/${verificationToken}`
+            text: `Hi ${user.name}, Please verify your email by clicking on the following link: http://localhost:5173/verify-your-email/${verificationToken}`
         })
 
         return res.status(201).json({
-            message: "user created successfully",
-            user: {
-                id: user.id,
-                name: user.name
-            }
+            message: "user created successfully"
         })
 
     } catch (err) {
@@ -96,8 +92,7 @@ export const getUser = async (req: Request, res: Response) => {
             user: {
                 id: user.id,
                 name: user.name,
-                email: user.email,
-                isVerified: user.isVerified
+                email: user.email
             }
         })
     }
@@ -195,7 +190,7 @@ export const resetPassword = async (req: Request, res: Response) => {
             from: process.env.MAIL,
             to: user.email,
             subject: 'Reset your password',
-            text: `Hi ${user.name}, Please reset your password by clicking on the following link: https://localhost:5173/reset-your-password/${passwordResetToken}`
+            text: `Hi ${user.name}, Please reset your password by clicking on the following link: http://localhost:5173/reset-your-password/${passwordResetToken}`
         })
 
         return res.status(200).json({

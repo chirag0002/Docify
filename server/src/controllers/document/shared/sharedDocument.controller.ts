@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { Permission, PrismaClient } from "@prisma/client";
 import { z } from "zod";
 import { sendMail } from "../../../smtp-config";
 
@@ -38,18 +38,55 @@ export const shareDocument = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "you are not allowed to share this document" })
         }
 
-        const sharedUser = await prisma.user.findUnique({
+        const user = await prisma.user.findUnique({
             where: {
                 email: email
             }
         })
-        if (!sharedUser) {
+        if (!user) {
             return res.status(404).json({ message: "user not exists" })
         }
 
-        const documentUser = await prisma.documentUser.create({
+        const sharedUser = await prisma.documentUser.findFirst({
+            where: {
+                userId: user.id,
+                documentId: id
+            }
+        })
+
+        if(sharedUser){
+            if(sharedUser.permission === permission){
+                return res.status(403).json({ message: `you already shared this document with user with ${permission} access`  })
+            } else {
+                await prisma.documentUser.update({
+                    where: {
+                        id: sharedUser.id,
+                        userId: user.id,
+                        documentId: id
+                    },
+                    data: {
+                        permission: permission
+                    }
+                })
+
+                const mail = {
+                    from: document.user.email,
+                    to: user.email,
+                    subject: `${document.user.name} shared a document with you with ${permission} access`,
+                    text: `Hi ${user.name}, You can access the document here: http://localhost:5173/document/${id}`
+                }
+        
+                await sendMail(mail)
+
+                return res.status(200).json({
+                    message: `document shared with ${permission} access`
+                })
+            }
+        }
+
+        await prisma.documentUser.create({
             data: {
-                userId: sharedUser.id,
+                userId: user.id,
                 documentId: id,
                 permission: permission
             }
@@ -57,14 +94,14 @@ export const shareDocument = async (req: Request, res: Response) => {
 
         const mail = {
             from: document.user.email,
-            to: sharedUser.email,
-            subject: `${document.user.name} shared a document with you`,
-            text: `Hi ${sharedUser.name}, You can access the document here: https://localhost:3000/document/${id}`
+            to: user.email,
+            subject: `${document.user.name} shared a document with you with ${permission} access`,
+            text: `Hi ${user.name}, You can access the document here: http://localhost:5173/document/${id}`
         }
 
         await sendMail(mail)
 
-        return res.status(200).json({ message: "document shared" })
+        return res.status(200).json({ message: `document shared with ${permission} access` })
     } catch (err) {
         return res.status(500).json(err)
     }
@@ -103,6 +140,41 @@ export const deleteShareDocument = async (req: Request, res: Response) => {
         })
 
         return res.status(200).json({ message: "document deleted" })
+    } catch (err) {
+        return res.status(500).json(err)
+    }
+}
+
+export const checkPermissions = async (req: Request, res: Response) => {
+    const { documentId, userId } = req.params
+
+    try {
+        const document = await prisma.document.findUnique({
+            where: {
+                id: Number(documentId),
+                userId: Number(userId)
+            }
+        })
+
+        if (!document) {
+            return res.status(404).json({ message: "document not found" })
+        }
+
+        const documentUser = await prisma.documentUser.findFirst({
+            where: {
+                userId: Number(userId),
+                documentId: Number(documentId)
+            }
+        })
+
+        if (!documentUser) {
+            return res.status(404).json({ message: "document user not found" })
+        }
+
+        return res.status(200).json({ 
+            message: "document found",
+            permission: documentUser.permission
+     })
     } catch (err) {
         return res.status(500).json(err)
     }

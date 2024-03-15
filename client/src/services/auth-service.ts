@@ -23,5 +23,10 @@ export const AuthService = {
     },
     confirmPassword: (payload:{password:string}, token?:string ) => {
         return API.put(`/api/v1/user/password/${token}`, payload)    
+    },
+    getUser: (id:string, token:string) => {
+        return API.get(`/api/v1/user/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        })
     }
 }

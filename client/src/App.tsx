@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
 import { ProtectedRoutes } from "./components/ProtectedRoute";
+import Document from "./pages/Document";
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
 
         <Route element={<ProtectedRoutes />}>
           <Route path="/" element={<Home />} />
+          <Route path="/document/:id" element={<Document />} />
         </Route>
 
       </Routes>

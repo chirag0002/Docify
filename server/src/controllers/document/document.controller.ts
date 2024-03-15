@@ -162,14 +162,18 @@ export const deleteDocument = async (req: Request, res: Response) => {
     const id = Number(req.params.id)
     const userId = req.user.id
 
-    await prisma.document.delete({
-        where: {
-            id: id,
-            userId: userId
-        }
-    })
+    try {
+        await prisma.document.delete({
+            where: {
+                id: id,
+                userId: userId
+            }
+        })
 
-    return res.status(200).json({
-        message: "document deleted"
-    })
+        return res.status(200).json({
+            message: "document deleted"
+        })
+    } catch (err) {
+        console.log(err)
+    }
 }

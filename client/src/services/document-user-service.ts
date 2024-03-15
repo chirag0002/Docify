@@ -1,9 +1,8 @@
-import { PermissionEnum } from "../interfaces/interfaces";
 import { API } from "./api";
 
 export const DocumentUserService = {
-    create: (accessToken: string, payload: { documentId: number; email: string; permission: PermissionEnum }) => {
-        return API.post(`/document/${payload.documentId}/share`, payload, {
+    create: (accessToken: string, payload: { documentId?: number; email: string; permission: string }) => {
+        return API.post(`/api/v1/document/${payload.documentId}/share`, payload, {
             headers: { Authorization: `Bearer ${accessToken}` },
         });
     },
@@ -13,5 +12,11 @@ export const DocumentUserService = {
             headers: { Authorization: `Bearer ${accessToken}` },
         });
     },
+
+    check: (accessToken: string, payload: { documentId: number; userId: number }) => {
+        return API.get(`/api/v1/document/${payload.documentId}/permission/${payload.userId}`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+        });
+    }
 
 }

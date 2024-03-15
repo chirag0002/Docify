@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import img from '../assets/logo.png';
 
-export const Navbar = () => {
+export const Navbar = ({name}:{name:string}) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -28,7 +28,7 @@ export const Navbar = () => {
         <nav className="w-full">
             <div className=" flex items-center justify-between mx-auto p-4">
                 <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-                    <img src={img} alt="Docify Logo" className="h-8" />
+                    <img src={img} alt="Docify Logo" className="flex flex-shrink-0 justify-center items-center w-10 h-12" />
                     <span className="self-center text-2xl font-semibold whitespace-nowrap">Docify</span>
                 </Link>
                 <div className="relative flex ">
@@ -41,8 +41,8 @@ export const Navbar = () => {
                         type="button"
                         onClick={toggleDropdown}
                     >
-                        <div className="flex text-2xl font-medium bg-gray-900 text-white w-10 h-10 rounded-full oveflow-hidden justify-center flex-col ">
-                            A
+                        <div className="flex text-2xl font-medium bg-sky-400 text-white w-10 h-10 rounded-full oveflow-hidden justify-center flex-col ">
+                            {name[0]}
                         </div>
                     </button>
                     {isDropdownOpen && (
