@@ -13,6 +13,22 @@ export const getDocumentOne = async (req: Request, res: Response) => {
             where: {
                 id: id,
                 userId: userId
+            },
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                userId: true,
+                documentUsers: {
+                    select: {
+                        user: {
+                            select: {
+                                id: true,
+                                email: true,
+                            }
+                        }
+                    }
+                }
             }
         });
 
@@ -23,7 +39,24 @@ export const getDocumentOne = async (req: Request, res: Response) => {
                     documentId: id
                 },
                 select: {
-                    document: true
+                    document: {
+                        select: {
+                            id: true,
+                            title: true,
+                            content: true,
+                            userId: true,
+                            documentUsers: {
+                                select: {
+                                    user: {
+                                        select: {
+                                            id: true,
+                                            email: true,
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             })
 
@@ -31,12 +64,33 @@ export const getDocumentOne = async (req: Request, res: Response) => {
                 return res.status(404).json({ message: "document not found" })
             }
 
+            const sharedUsers = sharedDocument.document.documentUsers.map(docUser => docUser.user);
+
+            const response = {
+                id: sharedDocument.document.id,
+                title: sharedDocument.document.title,
+                content: sharedDocument.document.content,
+                userId: sharedDocument.document.userId,
+                sharedUsers: sharedUsers
+            };
+
             return res.status(200).json({
-                document: sharedDocument.document
+                document: response
             })
         }
+
+        const sharedUsers = document.documentUsers.map(docUser => docUser.user);
+
+        const response = {
+            id: document.id,
+            title: document.title,
+            content: document.content,
+            userId: document.userId,
+            sharedUsers: sharedUsers
+        };
+
         return res.status(200).json({
-            document: document
+            document: response
         })
     } catch (err) {
         return res.status(500).json(err)
@@ -163,13 +217,25 @@ export const deleteDocument = async (req: Request, res: Response) => {
     const userId = req.user.id
 
     try {
-        await prisma.document.delete({
+        const document = await prisma.document.findUnique({
             where: {
                 id: id,
-                userId: userId
             }
         })
 
+        if (!document){
+            return res.status(404).json({ message: "ocument not found"})
+        }
+
+        if(document.userId != userId){ 
+            return res.status(404).json({ message: "you are not authorised"})
+        }
+
+        await prisma.document.delete({
+            where: {
+                id: id
+            }
+        })
         return res.status(200).json({
             message: "document deleted"
         })

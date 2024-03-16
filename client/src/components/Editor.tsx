@@ -1,30 +1,55 @@
-import { useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import ReactQuill from "react-quill"
 import 'react-quill/dist/quill.snow.css'
-import { SetterOrUpdater } from "recoil";
-import { DocumentService } from "../services/document-service";
+import { Socket, io } from "socket.io-client"
 
-export const Editor = ({ document, setDocument, id, permission }: { permission:boolean, document: { title: string; content: string; }, id?: string, setDocument: SetterOrUpdater<{ title: string; content: string; userId:string }> }) => {
+export const Editor = ({
+    content,
+    setContent,
+    id,
+    permission
+}: {
+    permission: boolean,
+    content: string,
+    setContent: Dispatch<SetStateAction<string>>,
+    id?: string
+}) => {
+
     const token = sessionStorage.getItem('token');
-    const [timer, setTimer] = useState<number | null>(null);
+    const [socket, setSocket] = useState<Socket | null>(null);
 
-    let content = document.content;
+    useEffect(() => {
+        const socket = io('http://localhost:8080', {
+            query: {
+                accessToken: token,
+                documentId: id
+            }
+        })
+        setSocket(socket)
+
+        return () => {
+            socket.disconnect()
+        }
+    }, [])
+
+    useEffect(() => {
+        if (socket) {
+            const handleReceiveContent = (content: string): void => {
+                setContent(content);
+            };
+            socket.on("receive-content", handleReceiveContent);
+            
+            socket.on("send_emails", (emails) => {
+                console.log(emails)
+            })
+            return (): void => {
+                socket.off("receive-content", handleReceiveContent);
+            };
+        }
+    }, [socket, setContent]);
 
     const contentInput = (value: string) => {
-        if (timer) {
-            clearTimeout(timer);
-        }
-        setDocument(document => ({
-            ...document,
-            content: value
-        }));
-        const newTimer = setTimeout(async () => {
-            if (token && id) {
-                await DocumentService.update(token, { id, content: value });
-            }
-        }, 1000);
-        setTimer(newTimer);
-
+        socket?.emit("content", value)
     };
 
     const modules = {

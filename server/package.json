@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc -b",
-    "start": "nodemon dist/src/index.js",
-    "dev": "concurrently \"tsc -b --watch\" \"nodemon -q dist/src/index.js\" "
+    "start": "nodemon dist/src/server.js",
+    "dev": "concurrently \"tsc -b --watch\" \"nodemon -q dist/src/server.js\" "
   },
   "keywords": [],
   "author": "",
@@ -28,6 +28,7 @@
     "nodemailer": "^6.9.12",
     "nodemon": "^3.1.0",
     "prisma": "^5.10.2",
+    "socket.io": "^4.7.5",
     "zod": "^3.22.4"
   }
 }

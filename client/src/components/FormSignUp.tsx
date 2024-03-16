@@ -21,7 +21,7 @@ export const FormSignup = () => {
             navigate('/verify')
 
         } catch (error: any) {
-            alert(`Error while signing up: ${error.response.message}`);
+            alert(`Error while signing up: ${error.response.data.message}`);
             SetLoading(false)
         }      
     }

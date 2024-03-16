@@ -71,23 +71,8 @@ export const userSignInAuthentication = async (req: Request, res: Response, next
         const accessToken = sign({ id: user.id, email: user.email }, process.env.ACCESS_KEY, {
             expiresIn: '24h'
         })
-        const refreshToken = sign({ id: user.id, email: user.email }, process.env.REFRESH_KEY, {
-            expiresIn: '24h'
-        })
-
-        await prisma.refreshToken.upsert({
-            where: { userId: user.id },
-            create: {
-                userId: user.id,
-                token: refreshToken
-            },
-            update: {
-                token: refreshToken
-            }
-        });
 
         req.accessToken = accessToken;
-        req.refreshToken = refreshToken;
         req.user = user
 
         next()

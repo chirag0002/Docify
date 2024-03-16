@@ -15,7 +15,7 @@ const Home = () => {
     if (userId && token) {
       AuthService.getUser(userId, token).then(res => {
         setUser(res.data.user);
-      })
+      }).catch(err => alert(err.response.data.message));
     }
   },[])
 

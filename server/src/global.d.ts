@@ -3,7 +3,6 @@ declare global {
     namespace Express {
         interface Request {
             accessToken?: string;
-            refreshToken?: string;
             user: {
                 id?: number,
                 name?: string,
@@ -22,7 +21,6 @@ declare global {
             EMAIL_KEY: string;
             ACCESS_KEY: string;
             PASSWORD_KEY: string;
-            REFRESH_KEY: string;
         }
     }
 }

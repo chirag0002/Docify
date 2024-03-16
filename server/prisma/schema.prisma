@@ -15,16 +15,8 @@ model User {
   verificationToken  String
   isVerified         Boolean        @default(false)
   passwordResetToken String?
-  refreshToken       refreshToken?
   documents          Document[]
   documentsUsers     documentUser[]
-}
-
-model refreshToken {
-  id     Int    @id @default(autoincrement())
-  token  String
-  userId Int    @unique
-  user   User   @relation(fields: [userId], references: [id])
 }
 
 model Document {

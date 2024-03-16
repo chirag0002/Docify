@@ -1,9 +1,9 @@
 import { FormEvent, MouseEventHandler, useState } from "react";
 import logo from '../assets/logo.png';
 import { DocumentService } from "../services/document-service";
-import {ShareModal} from "./ShareModal";
+import { ShareModal } from "./ShareModal";
 
-export const DocumentCard = ({ name, content, onClick, id }: { id?: number, content: string | TrustedHTML, name?: string, onClick: MouseEventHandler<HTMLDivElement> }) => {
+export const DocumentCard = ({ name, content, onClick, id }: { id?: number, content?: string | TrustedHTML, name?: string, onClick: MouseEventHandler<HTMLDivElement> }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const token = sessionStorage.getItem('token');
@@ -18,6 +18,8 @@ export const DocumentCard = ({ name, content, onClick, id }: { id?: number, cont
     if (token) {
       DocumentService.delete(token, id).then(res => {
         alert(res.data.message);
+      }).catch(err => {
+        alert(err.response.data.message)
       })
     }
   };
@@ -34,10 +36,19 @@ export const DocumentCard = ({ name, content, onClick, id }: { id?: number, cont
     setShowDropdown(!showDropdown);
   };
 
+
   return (
     <div className=" w-1/5 mb-8 flex justify-center flex-col items-center cursor-pointer">
       <div onClick={onClick} className="w-3/4 h-64 bg-white shadow rounded flex flex-col justify-between relative">
-        <div className="p-3 text-xs font-extralight text-justify" dangerouslySetInnerHTML={{ __html: content }} />
+        {content ? (
+          <>
+            <div className="p-3 font-extralight text-justify overflow-hidden" dangerouslySetInnerHTML={{ __html: content }} style={{ fontSize: "4px" }} />
+          </>
+        ) : (
+          <>
+            <div />
+          </>
+        )}
         <div className="flex justify-between flex-col px-4">
           <p className="text-sm text-gray-800 mt-2">{name}</p>
           <div className="flex items-center">

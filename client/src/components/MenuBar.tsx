@@ -15,7 +15,8 @@ export const DocumentMenuBar = () => {
 
     useEffect(() => {
         if (id && token) {
-            DocumentService.get(token, id).then(res => {
+            const documentId  = parseInt(id)
+            DocumentService.get(token, documentId).then(res => {
                 setDocument({
                     title: res.data.document.title,
                     content: res.data.document.content,

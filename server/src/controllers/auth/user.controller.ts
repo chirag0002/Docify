@@ -44,14 +44,12 @@ export const signUp = async (req: Request, res: Response) => {
 
 export const signIn = (req: Request, res: Response) => {
     const accessToken = req.accessToken
-    const refreshToken = req.refreshToken
 
     const user = req.user
 
     return res.status(200).json({
         message: "user signed in successfully",
         accessToken: accessToken,
-        refreshToken: refreshToken,
         user: {
             id: user?.id,
             name: user?.name,
@@ -61,12 +59,6 @@ export const signIn = (req: Request, res: Response) => {
 
 export const signOut = async (req: Request, res: Response) => {
     const id = req.user.id
-
-    await prisma.refreshToken.delete({
-        where: {
-            userId: id
-        }
-    })
 
     return res.status(200).json({
         message: "user signed out successfully"
@@ -95,59 +87,6 @@ export const getUser = async (req: Request, res: Response) => {
                 email: user.email
             }
         })
-    }
-}
-
-export const refreshToken = async (req: Request, res: Response) => {
-    const { token } = req.body
-
-    if (!token) {
-        return res.status(400).json({ message: "token is required" })
-    }
-
-    try {
-        const valid = await prisma.refreshToken.findFirst({
-            where: {
-                token: token
-            }
-        })
-
-        if (!valid) {
-            return res.status(403).json({ message: "token is invalid" })
-        }
-
-        verify(token, process.env.REFRESH_KEY, async (error: VerifyErrors | null, decoded: any) => {
-            if (error) {
-                return res.status(403).json({ message: "Token is invalid" });
-            }
-            try {
-                if (!decoded) {
-                    return res.status(403).json({ message: "Decoded token is invalid" });
-                }
-                const accessToken = sign({ id: decoded.id, email: decoded.email }, process.env.ACCESS_KEY, {
-                    expiresIn: '24h'
-                });
-                const refreshToken = sign({ id: decoded.id, email: decoded.email }, process.env.REFRESH_KEY, {
-                    expiresIn: '24h'
-                });
-
-                await prisma.refreshToken.update({
-                    where: { userId: decoded.id },
-                    data: {
-                        token: refreshToken
-                    }
-                });
-                res.status(200).json({
-                    message: "token refreshed successfully",
-                    accessToken: accessToken,
-                    refreshToken: refreshToken
-                })
-            } catch (err) {
-                return res.status(500).json(err)
-            }
-        });
-    } catch (err) {
-        return res.status(500).json(err)
     }
 }
 

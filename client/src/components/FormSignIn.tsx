@@ -17,13 +17,12 @@ export const FormSignin = () => {
             const response = await AuthService.signin(postInputs);
             alert(response.data.message);
             const accessToken = response.data.accessToken
-            const refreshToken = response.data.refreshToken
             sessionStorage.setItem('token', accessToken)
             sessionStorage.setItem('userId', response.data.user.id)
             SetLoading(false)
             navigate('/')
         } catch (error: any) {
-            alert(`Error while signing up: ${error.response.message}`);
+            alert(`Error while signing up: ${error.response.data.message}`);
             SetLoading(false)
         }
     }

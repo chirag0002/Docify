@@ -9,7 +9,7 @@ export const DocumentService = {
             }
         );
     },
-    get: (accessToken: string, documentId: string) => {
+    get: (accessToken: string, documentId: number) => {
         return API.get(`/api/v1/document/${documentId}`, {
             headers: { Authorization: `Bearer ${accessToken}` },
         });

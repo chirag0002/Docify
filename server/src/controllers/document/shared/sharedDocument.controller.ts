@@ -109,17 +109,19 @@ export const shareDocument = async (req: Request, res: Response) => {
 
 export const deleteShareDocument = async (req: Request, res: Response) => {
     const { documentId, userId } = req.params
+    const ownerId = req.user.id
+
 
     try {
         const document = await prisma.document.findUnique({
             where: {
                 id: Number(documentId),
-                userId: Number(userId)
+                userId: ownerId
             }
         })
 
         if (!document) {
-            return res.status(404).json({ message: "document not found" })
+            return res.status(404).json({ message: "you are not authorised" })
         }
 
         const documentUser = await prisma.documentUser.findFirst({
@@ -139,7 +141,7 @@ export const deleteShareDocument = async (req: Request, res: Response) => {
             }
         })
 
-        return res.status(200).json({ message: "document deleted" })
+        return res.status(200).json({ message: "user removed" })
     } catch (err) {
         return res.status(500).json(err)
     }
@@ -151,8 +153,7 @@ export const checkPermissions = async (req: Request, res: Response) => {
     try {
         const document = await prisma.document.findUnique({
             where: {
-                id: Number(documentId),
-                userId: Number(userId)
+                id: Number(documentId)
             }
         })
 

@@ -18,3 +18,13 @@ export const documentAtom = atom({
         userId:''
     }, 
 });
+
+interface User {
+    id: number;
+    email: string;
+}
+
+export const documentUsersAtom = atom<User[]>({
+    key: 'documentUsersAtom',
+    default: []
+});
