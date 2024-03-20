@@ -104,7 +104,7 @@ export const resetPassword = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "user does not exists" })
         }
 
-        const passwordResetToken = sign({ id: user.id, email: user.email }, "passwordresettoken", {
+        const passwordResetToken = sign({ id: user.id, email: user.email }, process.env.PASSWORD_KEY, {
             expiresIn: '2h'
         })
 
@@ -147,7 +147,7 @@ export const confirmPassword = async (req: Request, res: Response) => {
     const hashedPassword = await hash(password, salt)
 
     const token = req.params.token
-    verify(token, "passwordresettoken", async (error: VerifyErrors | null, decoded: any) => {
+    verify(token, process.env.PASSWORD_KEY, async (error: VerifyErrors | null, decoded: any) => {
         if (error) {
             return res.status(403).json({ message: "token is invalid" });
         }
