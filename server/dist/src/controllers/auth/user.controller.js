@@ -34,7 +34,7 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             from: process.env.MAIL,
             to: user.email,
             subject: 'Welcome to Docify, verify your email',
-            text: `Hi ${user.name}, Please verify your email by clicking on the following link: http://localhost:5173/verify-your-email/${verificationToken}`
+            text: `Hi ${user.name}, Please verify your email by clicking on the following link: https://docify.netlify.app/verify-your-email/${verificationToken}`
         });
         return res.status(201).json({
             message: "user created successfully"
@@ -100,7 +100,7 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         if (!user) {
             return res.status(404).json({ message: "user does not exists" });
         }
-        const passwordResetToken = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email }, "passwordresettoken", {
+        const passwordResetToken = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email }, process.env.PASSWORD_KEY, {
             expiresIn: '2h'
         });
         yield prisma.user.update({
@@ -115,7 +115,7 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             from: process.env.MAIL,
             to: user.email,
             subject: 'Reset your password',
-            text: `Hi ${user.name}, Please reset your password by clicking on the following link: http://localhost:5173/reset-your-password/${passwordResetToken}`
+            text: `Hi ${user.name}, Please reset your password by clicking on the following link: https://docify.netlify.app/reset-your-password/${passwordResetToken}`
         });
         return res.status(200).json({
             message: "password reset link sent successfully"
@@ -138,7 +138,7 @@ const confirmPassword = (req, res) => __awaiter(void 0, void 0, void 0, function
     const salt = yield (0, bcrypt_1.genSalt)();
     const hashedPassword = yield (0, bcrypt_1.hash)(password, salt);
     const token = req.params.token;
-    (0, jsonwebtoken_1.verify)(token, "passwordresettoken", (error, decoded) => __awaiter(void 0, void 0, void 0, function* () {
+    (0, jsonwebtoken_1.verify)(token, process.env.PASSWORD_KEY, (error, decoded) => __awaiter(void 0, void 0, void 0, function* () {
         if (error) {
             return res.status(403).json({ message: "token is invalid" });
         }
