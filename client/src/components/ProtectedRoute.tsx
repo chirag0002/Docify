@@ -8,3 +8,11 @@ export const ProtectedRoutes = () => {
     )
     
 }
+
+export const DefendingRoutes = () => {
+    const token = sessionStorage.getItem('token')
+    
+    return (
+        (!token)? <Outlet /> : <Navigate  to="/"/> 
+    )
+}

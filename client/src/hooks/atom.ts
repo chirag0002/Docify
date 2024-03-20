@@ -28,3 +28,12 @@ export const documentUsersAtom = atom<User[]>({
     key: 'documentUsersAtom',
     default: []
 });
+
+interface onlineUser {
+    email: string;
+}
+
+export const onlineUsersAtom = atom<onlineUser[]>({
+    key: 'onlineUsersAtom',
+    default: []
+})

@@ -11,6 +11,7 @@ export interface DocumentInterface {
     id?: number;
     title?: string;
     content?: string;
+    updated_at?: string;
     userId?: number;
     users?: DocumentUserInterface[];
 }

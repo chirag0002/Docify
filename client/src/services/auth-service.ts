@@ -7,11 +7,6 @@ export const AuthService = {
     signup: (payload:{name?:string, email:string, password:string}) => {
         return API.post('/api/v1/user/signup', payload)
     },
-    logout: (accessToken:string) => {
-        return API.delete('/api/v1/user/logout', {
-            headers : { Authorization: `Bearer ${accessToken}` }
-        })
-    },
     verifyEmail: (token?:string) => {
         return API.put(`/api/v1/user/verify-email/${token}`)
     },

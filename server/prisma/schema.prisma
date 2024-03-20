@@ -24,6 +24,7 @@ model Document {
   title         String?
   content       String?
   userId        Int
+  updated_at    DateTime       @updatedAt
   user          User           @relation(fields: [userId], references: [id])
   documentUsers documentUser[]
 }

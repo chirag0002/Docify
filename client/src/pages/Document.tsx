@@ -5,6 +5,7 @@ import { documentAtom } from "../hooks/atom"
 import { useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { DocumentUserService } from "../services/document-user-service"
+import { DocumentService } from "../services/document-service"
 
 
 const Document = () => {
@@ -14,15 +15,19 @@ const Document = () => {
   const { id } = useParams()
   const userId = sessionStorage.getItem('userId')
   const token = sessionStorage.getItem('token')
-  const [content, setContent] = useState('')
 
 
   useEffect(() => {
-    setDocument(document => ({
-      ...document,
-      content: content
-    }))
-  }, [content])
+    if (!token || !id) return
+    
+    DocumentService.get(token, parseInt(id)).then((response) => {
+      setDocument(document => ({
+        ...document,
+        content: response.data.document.content
+      }))
+    }).catch(err => alert(err.response.data.message))
+
+  }, [])
 
   useEffect(() => {
     if (userId && id && token && document.userId) {
@@ -38,7 +43,7 @@ const Document = () => {
   return (
     <div>
       <DocumentMenuBar />
-      <Editor content={content} setContent={setContent} id={id} permission={readPermission} />
+      <Editor doc={document} id={id} permission={readPermission} />
     </div>
   )
 }

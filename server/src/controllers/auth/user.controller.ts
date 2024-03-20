@@ -57,14 +57,6 @@ export const signIn = (req: Request, res: Response) => {
     })
 }
 
-export const signOut = async (req: Request, res: Response) => {
-    const id = req.user.id
-
-    return res.status(200).json({
-        message: "user signed out successfully"
-    })
-}
-
 export const getUser = async (req: Request, res: Response) => {
     const userId = req.params.id
 

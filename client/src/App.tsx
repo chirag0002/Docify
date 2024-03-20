@@ -4,7 +4,7 @@ import SignUp from "./pages/SignUp";
 import Home from "./pages/Home";
 import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
-import { ProtectedRoutes } from "./components/ProtectedRoute";
+import { DefendingRoutes, ProtectedRoutes } from "./components/ProtectedRoute";
 import Document from "./pages/Document";
 
 function App() {
@@ -12,12 +12,14 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/verify/" element={<VerifyEmail />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-your-password/:token" element={<ForgotPassword />} />
-        <Route path="/verify-your-email/:token" element={<VerifyEmail />} />
+        <Route element={<DefendingRoutes />}>
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/verify/" element={<VerifyEmail />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-your-password/:token" element={<ForgotPassword />} />
+          <Route path="/verify-your-email/:token" element={<VerifyEmail />} />
+        </Route>
 
         <Route element={<ProtectedRoutes />}>
           <Route path="/" element={<Home />} />

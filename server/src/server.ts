@@ -46,10 +46,15 @@ io.on('connection', (socket) => {
             }).then(doc => {
                 if (!doc) return socket.disconnect()
                 socket.join(documentId)
-                console.log("joined room", documentId)
+
                 socket.on("content", (data) => {
                     socket.to(documentId).emit("receive-content", data)
                 })
+
+                socket.on("mouse-move", (data) => {
+                    const userEmail = (socket as any).email;
+                    socket.to(documentId).emit("mouse-move", {data, userEmail});
+                });
 
                 io.in(documentId).fetchSockets().then((clients) => {
                     io.sockets.in(documentId).emit("send_emails", clients.map((client) => (client as any).email)
