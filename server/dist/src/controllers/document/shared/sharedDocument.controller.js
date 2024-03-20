@@ -75,7 +75,7 @@ const shareDocument = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                     from: document.user.email,
                     to: user.email,
                     subject: `${document.user.name} shared a document with you with ${permission} access`,
-                    text: `Hi ${user.name}, You can access the document here: https://docify.netlify.app/document/${id}`
+                    text: `Hi ${user.name}, You can access the document here: ${process.env.LINK}/document/${id}`
                 };
                 yield (0, smtp_config_1.sendMail)(mail);
                 return res.status(200).json({
@@ -94,7 +94,7 @@ const shareDocument = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             from: document.user.email,
             to: user.email,
             subject: `${document.user.name} shared a document with you with ${permission} access`,
-            text: `Hi ${user.name}, You can access the document here: https://docify.netlify.app/document/${id}`
+            text: `Hi ${user.name}, You can access the document here: ${process.env.LINK}/document/${id}`
         };
         yield (0, smtp_config_1.sendMail)(mail);
         return res.status(200).json({ message: `document shared with ${permission} access` });

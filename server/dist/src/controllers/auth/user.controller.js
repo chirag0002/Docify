@@ -34,7 +34,7 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             from: process.env.MAIL,
             to: user.email,
             subject: 'Welcome to Docify, verify your email',
-            text: `Hi ${user.name}, Please verify your email by clicking on the following link: https://docify.netlify.app/verify-your-email/${verificationToken}`
+            text: `Hi ${user.name}, Please verify your email by clicking on the following link: ${process.env.LINK}/verify-your-email/${verificationToken}`
         });
         return res.status(201).json({
             message: "user created successfully"
@@ -115,7 +115,7 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             from: process.env.MAIL,
             to: user.email,
             subject: 'Reset your password',
-            text: `Hi ${user.name}, Please reset your password by clicking on the following link: https://docify.netlify.app/reset-your-password/${passwordResetToken}`
+            text: `Hi ${user.name}, Please reset your password by clicking on the following link: ${process.env.LINK}/reset-your-password/${passwordResetToken}`
         });
         return res.status(200).json({
             message: "password reset link sent successfully"
