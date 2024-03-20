@@ -73,7 +73,7 @@ export const shareDocument = async (req: Request, res: Response) => {
                     from: document.user.email,
                     to: user.email,
                     subject: `${document.user.name} shared a document with you with ${permission} access`,
-                    text: `Hi ${user.name}, You can access the document here: http://localhost:5173/document/${id}`
+                    text: `Hi ${user.name}, You can access the document here: https://docify.netlify.app/document/${id}`
                 }
         
                 await sendMail(mail)
@@ -96,7 +96,7 @@ export const shareDocument = async (req: Request, res: Response) => {
             from: document.user.email,
             to: user.email,
             subject: `${document.user.name} shared a document with you with ${permission} access`,
-            text: `Hi ${user.name}, You can access the document here: http://localhost:5173/document/${id}`
+            text: `Hi ${user.name}, You can access the document here: https://docify.netlify.app/document/${id}`
         }
 
         await sendMail(mail)
