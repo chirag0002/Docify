@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.router = void 0;
+const express_1 = require("express");
+const authorization_middleware_1 = require("../middlewares/authorization.middleware");
+const document_controller_1 = require("../controllers/document/document.controller");
+const sharedDocument_controller_1 = require("../controllers/document/shared/sharedDocument.controller");
+exports.router = (0, express_1.Router)();
+exports.router.get('/:id', authorization_middleware_1.userAuthorization, document_controller_1.getDocumentOne);
+exports.router.get('/', authorization_middleware_1.userAuthorization, document_controller_1.getDocumentAll);
+exports.router.post('/', authorization_middleware_1.userAuthorization, document_controller_1.createDocument);
+exports.router.put('/:id', authorization_middleware_1.userAuthorization, document_controller_1.updateDocument);
+exports.router.delete('/:id', authorization_middleware_1.userAuthorization, document_controller_1.deleteDocument);
+exports.router.post('/:id/share', authorization_middleware_1.userAuthorization, sharedDocument_controller_1.shareDocument);
+exports.router.delete('/:documentId/share/:userId', authorization_middleware_1.userAuthorization, sharedDocument_controller_1.deleteShareDocument);
+exports.router.get('/:documentId/permission/:userId', authorization_middleware_1.userAuthorization, sharedDocument_controller_1.checkPermissions);
