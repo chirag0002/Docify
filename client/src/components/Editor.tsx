@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactQuill from "react-quill"
 import 'react-quill/dist/quill.snow.css'
 import { Socket, io } from "socket.io-client"
@@ -6,6 +6,7 @@ import { DocumentService } from "../services/document-service";
 import { useSetRecoilState } from "recoil";
 import { onlineUsersAtom } from "../hooks/atom";
 import arrow from '../assets/arrow.png'
+import { BASE_URL } from "../services/api";
 
 export const Editor = ({
     doc,
@@ -29,7 +30,7 @@ export const Editor = ({
     }, [doc.content]);
 
     useEffect(() => {
-        const socket = io('http://localhost:8080', {
+        const socket = io(BASE_URL, {
             query: {
                 accessToken: token,
                 documentId: id
@@ -44,11 +45,9 @@ export const Editor = ({
 
     useEffect(() => {
         if (socket) {
-            const handleReceiveContent = (content: string): void => {
-                setContent(content);
-
-            };
-            socket.on("receive-content", handleReceiveContent);
+            socket.on("receive-content", (newContent: string) => {
+                setContent(newContent);
+            });
 
             socket.on("send_emails", (emails) => {
                 setOnlineUsers(emails.map((email: string) => ({ email })));
@@ -71,7 +70,9 @@ export const Editor = ({
             });
 
             return (): void => {
-                socket.off("receive-content", handleReceiveContent);
+                socket.off("receive-content");
+                socket.off("send_emails");
+                socket.off("mouse_move");
             };
         }
     }, [socket, setContent]);
@@ -90,13 +91,14 @@ export const Editor = ({
         };
     }, [socket]);
 
+
     const contentInput = (value: string) => {
         if (timer) {
             clearTimeout(timer);
         }
 
         setContent(value);
-        socket?.emit("content", value)
+        socket?.emit("content-change", value)
 
         const newTimer = setTimeout(async () => {
             if (token && id) {

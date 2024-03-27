@@ -46,7 +46,7 @@ io.on('connection', (socket) => {
             if (!doc)
                 return socket.disconnect();
             socket.join(documentId);
-            socket.on("content", (data) => {
+            socket.on("content-change", (data) => {
                 socket.to(documentId).emit("receive-content", data);
             });
             socket.on("mouse-move", (data) => {

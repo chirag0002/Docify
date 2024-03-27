@@ -1,8 +1,9 @@
 import http from "http";
 import app from './index'
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import { VerifyErrors, verify } from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
+
 
 const prisma = new PrismaClient()
 const PORT = process.env.PORT || 8081
@@ -45,9 +46,10 @@ io.on('connection', (socket) => {
                 }
             }).then(doc => {
                 if (!doc) return socket.disconnect()
+
                 socket.join(documentId)
 
-                socket.on("content", (data) => {
+                socket.on("content-change", (data) => {
                     socket.to(documentId).emit("receive-content", data)
                 })
 

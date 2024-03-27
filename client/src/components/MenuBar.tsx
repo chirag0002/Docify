@@ -3,7 +3,7 @@ import logo from '../assets/logo.png'
 import { DocumentService } from '../services/document-service';
 import { documentAtom, onlineUsersAtom } from '../hooks/atom';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { ShareModal } from './ShareModal';
 
 export const DocumentMenuBar = () => {
@@ -54,7 +54,9 @@ export const DocumentMenuBar = () => {
     return (
         <div className="w-full flex justify-between items-center px-3 pb-1 border-b">
             <div className="w-full flex justify-start items-center overflow-x-hidden md:overflow-visible">
-                <img src={logo} alt="" className="flex flex-shrink-0 justify-center items-center w-10 h-12 mx-5" />
+                <Link to='/'> 
+                    <img src={logo} alt="" className="flex flex-shrink-0 justify-center items-center w-10 h-12 mx-5" />
+                </Link>    
                 <div className="flex flex-col">
                     <input
                         maxLength={25}
